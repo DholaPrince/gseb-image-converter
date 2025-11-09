@@ -1,0 +1,54 @@
+import React, { useState } from "react";
+import LandingPage from "./LandingPage";
+import ImageConverter from "./ImageConverter";
+import SEO from "./SEO";
+import SplashScreen from "./SplashScreen";
+
+export default function App() {
+  const [mode, setMode] = useState(null);      // Photo or Signature mode
+  const [showSplash, setShowSplash] = useState(true); // Show splash screen initially
+
+  // Handle user selecting Photo / Signature
+  const handleSelect = (selectedMode) => setMode(selectedMode);
+
+  // Back button from converter to landing
+  const handleBack = () => setMode(null);
+
+  // Splash finished → show landing page
+  const handleSplashFinish = () => setShowSplash(false);
+
+  // Dynamic SEO based on mode
+  const seoTitle =
+    mode === "photo"
+      ? "Photograph Converter - GSEB Form Image"
+      : mode === "signature"
+      ? "Signature Converter - GSEB Form Image"
+      : "GSEB Image Converter - Resize Photo & Signature";
+
+  const seoDescription =
+    mode === "photo"
+      ? "Convert your photograph to 100x120px JPEG for GSEB board forms easily."
+      : mode === "signature"
+      ? "Convert your signature to 100x120px JPEG for GSEB board forms easily."
+      : "Convert your photograph or signature to the required 100x120px JPEG for GSEB board forms quickly and easily.";
+
+  return (
+    <>
+      {/* SEO */}
+      <SEO title={seoTitle} description={seoDescription} />
+
+      {/* Splash Screen */}
+      {showSplash ? (
+        <SplashScreen onFinish={handleSplashFinish} />
+      ) : (
+        <main className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-950">
+          {mode ? (
+            <ImageConverter mode={mode} onBack={handleBack} />
+          ) : (
+            <LandingPage onSelect={handleSelect} />
+          )}
+        </main>
+      )}
+    </>
+  );
+}
