@@ -1,11 +1,17 @@
 import React, { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./LandingPage";
 import ImageConverter from "./ImageConverter";
 import SEO from "./SEO";
 import SplashScreen from "./SplashScreen";
+import About from "./pages/About"
+import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
+import Footer from "./components/Footer";
+import ScrollToTop from "./ScrollToTop";
 
 export default function App() {
-  const [mode, setMode] = useState(null);      // Photo or Signature mode
+  const [mode, setMode] = useState(null); // Photo or Signature mode
   const [showSplash, setShowSplash] = useState(true); // Show splash screen initially
 
   // Handle user selecting Photo / Signature
@@ -33,22 +39,34 @@ export default function App() {
       : "Convert your photograph or signature to the required 100x120px JPEG for GSEB board forms quickly and easily.";
 
   return (
-    <>
+   <BrowserRouter>
       {/* SEO */}
       <SEO title={seoTitle} description={seoDescription} />
-
+<ScrollToTop/>
       {/* Splash Screen */}
       {showSplash ? (
         <SplashScreen onFinish={handleSplashFinish} />
       ) : (
-        <main className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-950">
-          {mode ? (
-            <ImageConverter mode={mode} onBack={handleBack} />
-          ) : (
-            <LandingPage onSelect={handleSelect} />
-          )}
-        </main>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <main className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-950">
+                {mode ? (
+                  <ImageConverter mode={mode} onBack={handleBack} />
+                ) : (
+                  <LandingPage onSelect={handleSelect} />
+                )}
+              </main>
+            }
+          />
+          {/* Example static pages routing */}
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<Privacy />} />
+        </Routes>
       )}
-    </>
+       <Footer />
+    </BrowserRouter>
   );
 }
