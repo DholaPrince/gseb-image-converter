@@ -31,6 +31,12 @@ const Footer = () => {
             <li>
               <Link to="/privacy">Privacy</Link>
             </li>
+            <li>
+              <Link to="/guidelines">Guidelines</Link>
+            </li>
+             {/* <li>
+              <Link to="/SignatureDrawer">Draw a Signature</Link>
+            </li> */}
           </ul>
         </div>
 

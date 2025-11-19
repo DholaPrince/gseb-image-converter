@@ -1,5 +1,4 @@
 import "./ImageConverter.css";
-
 import { useState, useRef } from "react"
 
 export default function ImageConverter({ mode, onBack }) {
@@ -8,6 +7,7 @@ export default function ImageConverter({ mode, onBack }) {
   const [error, setError] = useState("")
   const [warning, setWarning] = useState("")
   const [isConverting, setIsConverting] = useState(false)
+  const [fileSizeKB, setFileSizeKB] = useState(null)
   const canvasRef = useRef(null)
   const fileInputRef = useRef(null)
 
@@ -23,6 +23,84 @@ export default function ImageConverter({ mode, onBack }) {
     const reader = new FileReader()
     reader.onload = (event) => setImage(event.target.result)
     reader.readAsDataURL(file)
+  }
+
+  // New compression function that intelligently finds the right quality level
+  const compressToTargetSize = (canvas) => {
+    return new Promise((resolve) => {
+      const minSize = 5 * 1024 // 5 KB
+      const maxSize = 20 * 1024 // 20 KB
+      
+      // Binary search to find the right quality level
+      let lowQuality = 0.01
+      let highQuality = 1.0
+      let bestBlob = null
+      let bestQuality = 0.5
+
+      const tryQuality = (quality) => {
+        return new Promise((resolveQuality) => {
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                resolveQuality(null)
+                return
+              }
+              
+              const sizeBytes = blob.size
+              
+              // If within target range, this is good
+              if (sizeBytes >= minSize && sizeBytes <= maxSize) {
+                bestBlob = blob
+                bestQuality = quality
+                resolveQuality(blob)
+              } else {
+                resolveQuality(null)
+              }
+            },
+            "image/jpeg",
+            quality
+          )
+        })
+      }
+
+      // First pass: try quality levels from high to low to find best fit
+      const qualityLevels = []
+      for (let i = 1.0; i >= 0.01; i -= 0.05) {
+        qualityLevels.push(parseFloat(i.toFixed(2)))
+      }
+
+      let index = 0
+      const tryNextQuality = async () => {
+        if (index >= qualityLevels.length) {
+          // If we found a good blob in target range, use it
+          if (bestBlob) {
+            resolve(bestBlob)
+          } else {
+            // Otherwise use the last attempted blob (closest to target)
+            canvas.toBlob(
+              (blob) => {
+                resolve(blob)
+              },
+              "image/jpeg",
+              bestQuality
+            )
+          }
+          return
+        }
+
+        const result = await tryQuality(qualityLevels[index])
+        if (result) {
+          // Found a blob in target range, use it
+          resolve(result)
+          return
+        }
+        
+        index++
+        tryNextQuality()
+      }
+
+      tryNextQuality()
+    })
   }
 
   const handleConvert = () => {
@@ -43,48 +121,63 @@ export default function ImageConverter({ mode, onBack }) {
       canvas.width = width
       canvas.height = height
 
-      const imgAspect = img.width / img.height
-      const targetAspect = width / height
+      if (mode === "signature") {
+        ctx.fillStyle = "#ffffff"
+        ctx.fillRect(0, 0, width, height)
 
-      let sx, sy, sWidth, sHeight
-      if (imgAspect > targetAspect) {
-        sHeight = img.height
-        sWidth = sHeight * targetAspect
-        sx = (img.width - sWidth) / 2
-        sy = 0
+        const padding = 5
+        const availWidth = width - padding * 2
+        const availHeight = height - padding * 2
+
+        const imgAspect = img.width / img.height
+        const availAspect = availWidth / availHeight
+
+        let drawWidth, drawHeight
+        if (imgAspect > availAspect) {
+          drawWidth = availWidth
+          drawHeight = availWidth / imgAspect
+        } else {
+          drawHeight = availHeight
+          drawWidth = drawHeight * imgAspect
+        }
+
+        const x = (width - drawWidth) / 2
+        const y = (height - drawHeight) / 2
+
+        ctx.drawImage(img, x, y, drawWidth, drawHeight)
       } else {
-        sWidth = img.width
-        sHeight = sWidth / targetAspect
-        sx = 0
-        sy = (img.height - sHeight) / 2
+        const imgAspect = img.width / img.height
+        const targetAspect = width / height
+
+        let sx, sy, sWidth, sHeight
+        if (imgAspect > targetAspect) {
+          sHeight = img.height
+          sWidth = sHeight * targetAspect
+          sx = (img.width - sWidth) / 2
+          sy = 0
+        } else {
+          sWidth = img.width
+          sHeight = sWidth / targetAspect
+          sx = 0
+          sy = (img.height - sHeight) / 2
+        }
+
+        ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, width, height)
       }
 
-      ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, width, height)
+      compressToTargetSize(canvas).then((blob) => {
+        if (!blob) {
+          setError("Failed to compress image")
+          setIsConverting(false)
+          return
+        }
 
-      let quality = 0.9
-      const tryCompress = () => {
-        canvas.toBlob(
-          (b) => {
-            if (!b) return
-            const sizeKB = b.size / 1024
-            if (sizeKB > 20 && quality > 0.2) {
-              quality -= 0.1
-              tryCompress()
-            } else if (sizeKB < 5 && quality < 1) {
-              quality += 0.05
-              tryCompress()
-            } else {
-              if (sizeKB < 5) setWarning("⚠️ Image size is very small (<5KB).")
-              if (sizeKB > 20) setWarning("⚠️ Image size is large (>20KB).")
-              setConvertedImage(URL.createObjectURL(b))
-              setIsConverting(false)
-            }
-          },
-          "image/jpeg",
-          quality,
-        )
-      }
-      tryCompress()
+        const finalSizeKB = (blob.size / 1024).toFixed(2)
+        setFileSizeKB(finalSizeKB)
+        setConvertedImage(URL.createObjectURL(blob))
+        setIsConverting(false)
+        setWarning("")
+      })
     }
   }
 
@@ -177,6 +270,11 @@ export default function ImageConverter({ mode, onBack }) {
             <div className="converter-result-container">
               <img src={convertedImage || "/placeholder.svg"} alt="Converted" className="converter-result-image" />
             </div>
+            {fileSizeKB && (
+              <p className="converter-file-size">
+                ✓ File Size: <strong>{fileSizeKB} KB</strong> (Optimized for board forms)
+              </p>
+            )}
             <button onClick={handleDownload} className={`converter-download-btn converter-download-${accentClass}`}>
               ⬇️ Download Image
             </button>

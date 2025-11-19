@@ -9,6 +9,9 @@ import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Footer from "./components/Footer";
 import ScrollToTop from "./ScrollToTop";
+import Guidelines from "./Guidelines";
+import FloatingGuidelineButton from "./FloatingGuidelineButton";
+// import SignatureDrawer from "./SignatureDrawer";
 
 export default function App() {
   const [mode, setMode] = useState(null); // Photo or Signature mode
@@ -64,8 +67,11 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/guidelines" element={<Guidelines />} />
+          {/* <Route path="/SignatureDrawer" element={<SignatureDrawer />} /> */}
         </Routes>
       )}
+      <FloatingGuidelineButton/>
        <Footer />
     </BrowserRouter>
   );

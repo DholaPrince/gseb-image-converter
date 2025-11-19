@@ -156,6 +156,23 @@
   margin-bottom: 0;
 }
 
+/* Added file size display styling */
+.converter-file-size {
+  font-size: 13px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+  text-align: center;
+  padding: 12px 16px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+}
+
+.converter-file-size strong {
+  color: #10b981;
+  font-weight: 600;
+}
+
 /* Preview Sections */
 .converter-preview-wrapper,
 .converter-result-wrapper {
