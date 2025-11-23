@@ -11,6 +11,7 @@ import Footer from "./components/Footer";
 import ScrollToTop from "./ScrollToTop";
 import Guidelines from "./Guidelines";
 import FloatingGuidelineButton from "./FloatingGuidelineButton";
+import MarksheetConverter from "./MarksheetConverter";
 // import SignatureDrawer from "./SignatureDrawer";
 
 export default function App() {
@@ -68,6 +69,7 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/guidelines" element={<Guidelines />} />
+          <Route path="/marksheet" element={<MarksheetConverter />} />
           {/* <Route path="/SignatureDrawer" element={<SignatureDrawer />} /> */}
         </Routes>
       )}
