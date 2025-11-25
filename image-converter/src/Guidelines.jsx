@@ -1,8 +1,14 @@
 import "./Guidelines.css"
 import { Link } from "react-router-dom";
+import SEO from "./SEO";
 
 export default function Guidelines() {
   return (
+    <>
+        <SEO
+                title="How to Use GSEB Image Converter - Upload, Convert, Download Guidelines"
+                description=" View the official guidelines and step-by-step instructions for using the GSEB Image Converter. Learn how to upload, optimize, and download your images correctly. "
+              />
     <div className="guidelines-page">
       <div className="guidelines-container">
         <div className="guidelines-header">
@@ -217,5 +223,6 @@ export default function Guidelines() {
         </section>
       </div>
     </div>
+    </>
   )
 }

@@ -30,16 +30,16 @@ export default function App() {
   // Dynamic SEO based on mode
   const seoTitle =
     mode === "photo"
-      ? "Photograph Converter - GSEB Form Image"
+      ? "GSEB Photograph Converter: Resize Photo to 100x120px for Board Forms"
       : mode === "signature"
-      ? "Signature Converter - GSEB Form Image"
-      : "GSEB Image Converter - Resize Photo & Signature";
+      ? "GSEB Signature Converter: Resize Image to 100x120px for Board Forms"
+      : "GSEB Image Converter: Resize Photo & Signature for Board Forms";
 
   const seoDescription =
     mode === "photo"
-      ? "Convert your photograph to 100x120px JPEG for GSEB board forms easily."
+      ? "Quickly convert and resize your passport photograph to the exact 100x120px JPEG format required for all GSEB online application forms."
       : mode === "signature"
-      ? "Convert your signature to 100x120px JPEG for GSEB board forms easily."
+      ? "Easily convert and resize your signature image to the exact 100x120px JPEG format required for all GSEB online application forms."
       : "Convert your photograph or signature to the required 100x120px JPEG for GSEB board forms quickly and easily.";
 
   return (

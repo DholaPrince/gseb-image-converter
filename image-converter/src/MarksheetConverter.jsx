@@ -1,5 +1,5 @@
 import "./MarksheetConverter.css"
-"use client"
+import SEO from "./SEO"
 
 import { useState, useRef } from "react"
 
@@ -187,6 +187,11 @@ const handleConvert = () => {
   }
 
   return (
+    <>
+    <SEO
+            title="GSEB 10th/12th Marksheet Converter: Optimize Image for Board Form"
+            description="Upload your 10th exam marksheet and convert it to an optimized format, ensuring it meets all size and file requirements for online board registration forms."
+          />
     <div className="marksheet-page">
       <div className="marksheet-container">
         {/* Back Button */}
@@ -347,5 +352,6 @@ const handleConvert = () => {
 
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
     </div>
+    </>
   )
 }

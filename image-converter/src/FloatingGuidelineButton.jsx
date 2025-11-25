@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import Guidelines from './Guidelines'
+// import Guidelines from './Guidelines'
+import AnimatedTutorial from './components/AnimatedTutorial'
 import './FloatingGuidelineButton.css'
 
 export default function FloatingGuidelineButton() {
@@ -30,7 +31,7 @@ export default function FloatingGuidelineButton() {
             >
               ✕
             </button>
-            <Guidelines />
+            <AnimatedTutorial />
           </div>
         </div>
       )}
